@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Attendance Dashboard</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI;
+}
+
+body{
+
+    min-height:100vh;
+
+    padding:40px;
+
+    color:white;
+
+    background: linear-gradient(
+        -45deg,
+        #163b91,
+        #0d2f66,
+        #2563eb,
+        #1bb8ab
+    );
+
+    background-size:400% 400%;
+
+    animation:gradientBG 12s ease infinite;
+}
+
+/* ANIMATION */
+
+@keyframes gradientBG{
+
+    0%{
+        background-position:0% 50%;
+    }
+
+    50%{
+        background-position:100% 50%;
+    }
+
+    100%{
+        background-position:0% 50%;
+    }
+}
+
+h1{
+
+    text-align:center;
+    margin-bottom:30px;
+
+    font-size:40px;
+
+    text-shadow:0 0 15px rgba(255,255,255,0.3);
+}
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+
+    background:rgba(50, 204, 19, 0.12);
+
+    backdrop-filter:blur(10px);
+
+    color:white;
+
+    border-radius:15px;
+
+    overflow:hidden;
+
+    box-shadow:0 8px 30px rgba(165, 14, 14, 0.3);
+}
+
+th{
+
+    background:#2563eb;
+    color:white;
+    padding:15px;
+
+    font-size:18px;
+}
+
+td{
+
+    padding:15px;
+    text-align:center;
+
+    border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+tr:hover{
+
+    background:rgba(255,255,255,0.08);
+
+    transition:0.3s;
+}
+
+.top-btn{
+
+    margin-bottom:20px;
+}
+
+.top-btn a{
+
+    text-decoration:none;
+
+    background:#22c55e;
+
+    color:white;
+
+    padding:12px 20px;
+
+    border-radius:10px;
+
+    transition:0.3s;
+}
+
+.top-btn a:hover{
+
+    background:#16a34a;
+
+    transform:scale(1.05);
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="top-btn">
+
+<a href="/home/">
+Back
+</a>
+
+</div>
+
+<h1>Attendance Dashboard</h1>
+
+<table>
+
+<tr>
+
+<th>Name</th>
+<th>Date</th>
+<th>Time</th>
+
+</tr>
+
+{% for row in data %}
+
+<tr>
+
+<td>{{ row.name }}</td>
+<td>{{ row.date }}</td>
+<td>{{ row.time }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</body>
+</html>

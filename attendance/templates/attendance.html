@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Attendance</title>
+
+<style>
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#141e30,#243b55);
+    font-family:Arial;
+}
+
+.container{
+    width:400px;
+    padding:40px;
+    border-radius:15px;
+    background:rgba(255,255,255,0.1);
+    text-align:center;
+    color:white;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:#00c6ff;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0072ff;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Start Attendance</h1>
+
+<br>
+
+<form method="POST" action="/start-attendance/">
+
+    {% csrf_token %}
+
+    <button type="submit">
+        Start Camera
+    </button>
+
+</form>
+
+</div>
+
+{% if messages %}
+
+<script>
+
+    {% for message in messages %}
+
+    alrt("{{ message }}");
+
+    {% endfor %}
+
+</script>
+
+{% endif %}
+
+</body>
+</html>
