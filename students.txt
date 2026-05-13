@@ -1,3 +1,2 @@
 Name,ID,Email 
-Purnananda Kirtania,2201367054,purna@gmail.com
 Suryakanta Sahoo,2321424010,kantasurya4109@gmail.com

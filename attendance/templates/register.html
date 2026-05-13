@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
+
 <title>Register - Face Attendance System</title>
 
 <style>
@@ -14,31 +17,52 @@
 }
 
 body{
-    height:100vh;
+    min-height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
     background: linear-gradient(-45deg, #11998e, #38ef7d, #00c9ff, #92fe9d);
     background-size:400% 400%;
     animation: gradientBG 10s ease infinite;
+    padding:20px;
 }
 
-/* Background animation */
+/* Background Animation */
+
 @keyframes gradientBG {
-    0%{background-position:0% 50%;}
-    50%{background-position:100% 50%;}
-    100%{background-position:0% 50%;}
+
+    0%{
+        background-position:0% 50%;
+    }
+
+    50%{
+        background-position:100% 50%;
+    }
+
+    100%{
+        background-position:0% 50%;
+    }
+
 }
 
 .container{
-    width:380px;
+
+    width:420px;
+
     padding:40px;
-    border-radius:15px;
+
+    border-radius:20px;
+
     background: rgba(255,255,255,0.1);
+
     backdrop-filter: blur(15px);
+
     box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+
     text-align:center;
+
     color:white;
+
 }
 
 h2{
@@ -46,92 +70,206 @@ h2{
 }
 
 input{
+
     width:100%;
+
     padding:12px;
+
     margin:10px 0;
+
     border:none;
+
     border-radius:8px;
+
     outline:none;
+
+    font-size:15px;
+
 }
 
 button{
+
     width:100%;
+
     padding:12px;
+
     margin-top:10px;
+
     border:none;
+
     border-radius:8px;
+
     background:#ff9800;
+
     color:white;
+
     font-size:16px;
+
     cursor:pointer;
+
     transition:0.3s;
+
 }
 
 button:hover{
+
     transform:scale(1.05);
+
     background:#e68900;
+
 }
 
 .top-right{
+
     position:absolute;
+
     right:20px;
+
     top:20px;
+
 }
 
 .top-left{
+
     position:absolute;
+
     left:20px;
+
     top:20px;
+
 }
 
 a{
+
     color:white;
+
     text-decoration:none;
+
+}
+
+/* Camera */
+
+.camera-box{
+
+    margin-top:20px;
+
+}
+
+video{
+
+    width:100%;
+
+    height:300px;
+
+    border-radius:15px;
+
+    border:3px solid white;
+
+    object-fit:cover;
+
+    background:black;
+
+}
+
+.camera-status{
+
+    margin-top:10px;
+
+    font-size:14px;
+
+    color:#fff;
+
 }
 
 </style>
+
 </head>
 
 <body>
 
-<!-- Top buttons -->
-<div class="top-left">⚙️</div>
+<!-- Top Buttons -->
+
+<div class="top-left">
+    ⚙️
+</div>
 
 <div class="top-right">
-    <a href="/logout/">Logout</a>
+
+    <a href="/logout/">
+        Logout
+    </a>
+
 </div>
+
+<!-- Main Container -->
 
 <div class="container">
 
-<h2>Register Student</h2>
+<h2>
+    Register Student
+</h2>
 
 <form method="POST">
 
     {% csrf_token %}
 
-    <input 
-        type="text" 
-        name="name" 
-        placeholder="Enter Name" 
+    <input
+        type="text"
+        name="name"
+        placeholder="Enter Name"
         required
     >
 
-    <input 
-        type="text" 
-        name="id" 
+    <input
+        type="text"
+        name="id"
         placeholder="Enter Student ID"
         required
     >
 
-    <input 
-        type="email" 
-        name="email" 
+    <input
+        type="email"
+        name="email"
         placeholder="Enter Email"
         required
     >
 
+    <!-- Open Camera Button -->
+
+    <button
+        type="button"
+        onclick="openCamera()"
+    >
+        Open Camera
+    </button>
+
+    <!-- Camera -->
+
+    <div class="camera-box">
+
+        <video
+            id="camera"
+            autoplay
+            playsinline
+        ></video>
+
+        <div
+            class="camera-status"
+            id="cameraStatus"
+        >
+
+            Camera is Off
+
+        </div>
+
+    </div>
+
+    <!-- Register Button -->
+
     <button type="submit">
+
         Register
+
     </button>
 
 </form>
@@ -150,7 +288,57 @@ alert("{{ message }}");
 
 {% endfor %}
 
+</script>
+
 {% endif %}
+
+<!-- CAMERA SCRIPT -->
+
+<script>
+
+async function openCamera(){
+
+    try{
+
+        const stream =
+        await navigator.mediaDevices.getUserMedia({
+
+            video:true,
+            audio:false
+
+        });
+
+        const video =
+        document.getElementById("camera");
+
+        video.srcObject = stream;
+
+        video.play();
+
+
+        document.getElementById(
+            "cameraStatus"
+        ).innerHTML =
+        "Camera Started Successfully";
+
+    }
+
+    catch(error){
+
+        console.log(error);
+
+        alert(
+            "Camera Access Denied"
+        );
+
+        document.getElementById(
+            "cameraStatus"
+        ).innerHTML =
+        "Unable To Open Camera";
+
+    }
+
+}
 
 </script>
 
