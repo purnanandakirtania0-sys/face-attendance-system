@@ -27,6 +27,9 @@ SECRET_KEY = 'django-insecure-e&l1tqpr%=xa&+$a&z6o9vhh=0vx&kt(k@#^&$l+ua&ky+mda&
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+"https://face-attendance-system-production-04a4.up.railway.app"
+]
 
 
 # Application definition
