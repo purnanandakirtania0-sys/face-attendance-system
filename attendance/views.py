@@ -1,313 +1,89 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-import subprocess
+from django.conf import settings
+
+from .models import Student
+
+import base64
+import uuid
 import os
-import csv
 
-BASE_DIR = os.path.dirname(
-    os.path.dirname(
-        os.path.abspath(__file__)
-    )
-)
-
-# ---------------- HOME PAGE ----------------
-
-def home(request):
-
-    if not request.session.get('user'):
-
-        return redirect('login')
-
-    return render(
-        request,
-        'home.html'
-    )
-
-# ---------------- LOGIN ----------------
 
 def login_page(request):
+    return render(request, 'login.html')
 
-    if request.method == "POST":
 
-        email = request.POST.get("email")
-        password = request.POST.get("password")
+def home_page(request):
+    return render(request, 'home.html')
 
-        # CHANGE YOUR LOGIN EMAIL & PASSWORD
-        if email == "admin@gmail.com" and password == "1234":
 
-            request.session['user'] = email
+def attendance_page(request):
+    return render(request, 'attendance.html')
 
-            return redirect('home')
 
-        else:
+def train_page(request):
+    return render(request, 'train.html')
 
-            messages.error(
-                request,
-                "Invalid Email or Password"
-            )
 
-    return render(
-        request,
-        'login.html'
-    )
+def dashboard_page(request):
 
-# ---------------- REGISTER FACE ----------------
+    students = Student.objects.all()
+
+    return render(request, 'dashboard.html', {
+        'students': students
+    })
+
 
 def register_face(request):
 
-    if not request.session.get('user'):
+    if request.method == 'POST':
 
-        return redirect('login')
+        name = request.POST.get('name')
+        dob = request.POST.get('dob')
+        email = request.POST.get('email')
+        image_data = request.POST.get('image')
 
-    if request.method == "POST":
+        if not image_data:
 
-        name = request.POST.get("name")
-        student_id = request.POST.get("id")
-        email = request.POST.get("email")
+            messages.error(request, 'Camera image not found')
 
-        # ---------------- CHECK DUPLICATE ----------------
+            return redirect('register_face')
 
-        student_exists = False
+        try:
 
-        if os.path.exists("students.txt"):
+            format, imgstr = image_data.split(';base64,')
 
-            with open("students.txt", "r") as f:
+            image_bytes = base64.b64decode(imgstr)
 
-                for line in f:
+            filename = f"{uuid.uuid4()}.png"
 
-                    data = line.strip().split(",")
+            filepath = os.path.join(
+                settings.MEDIA_ROOT,
+                filename
+            )
 
-                    if len(data) >= 2:
+            with open(filepath, 'wb') as f:
+                f.write(image_bytes)
 
-                        old_id = data[1]
+            Student.objects.create(
+                name=name,
+                dob=dob,
+                email=email,
+                image=filename
+            )
 
-                        if old_id == student_id:
+            messages.success(
+                request,
+                'Student Registered Successfully'
+            )
 
-                            student_exists = True
-                            break
+        except Exception as e:
 
-        # ---------------- SAVE STUDENT ----------------
+            messages.error(
+                request,
+                str(e)
+            )
 
-        if not student_exists:
+        return redirect('register_face')
 
-            with open("students.txt", "a") as f:
-
-                f.write(
-                    f"{name},{student_id},{email}\n"
-                )
-
-        # ---------------- RUN DATASET SCRIPT ----------------
-
-        script_path = os.path.join(
-            BASE_DIR,
-            'phase3_dataset_collection.py'
-        )
-
-        subprocess.run([
-            'python',
-            script_path,
-            name
-        ])
-
-        messages.success(
-            request,
-            "Face Registered Successfully"
-        )
-
-        return redirect('train_page')
-
-    return render(
-        request,
-        'register.html'
-    )
-
-# ---------------- TRAIN PAGE ----------------
-
-def train_page(request):
-
-    if not request.session.get('user'):
-
-        return redirect('login')
-
-    students = []
-
-    dataset_path = os.path.join(
-        BASE_DIR,
-        "dataset"
-    )
-
-    if os.path.exists("students.txt"):
-
-        unique_students = []
-
-        with open("students.txt", "r") as f:
-
-            lines = f.readlines()
-
-            for line in lines:
-
-                data = line.strip().split(",")
-
-                if len(data) >= 3:
-
-                    if data not in unique_students:
-
-                        unique_students.append(data)
-
-        for data in unique_students:
-
-            name = data[0]
-            student_id = data[1]
-            email = data[2]
-
-            image_name = ""
-
-            for file in os.listdir(dataset_path):
-
-                if (
-                    file.endswith(".jpg")
-                    and f".{name}." in file
-                ):
-
-                    image_name = file
-                    break
-
-            students.append({
-
-                "name": name,
-                "id": student_id,
-                "email": email,
-                "image": image_name
-
-            })
-
-    return render(
-        request,
-        'train.html',
-        {
-            'students': students
-        }
-    )
-
-# ---------------- TRAIN MODEL ----------------
-
-def train_model(request):
-
-    if not request.session.get('user'):
-
-        return redirect('login')
-
-    script_path = os.path.join(
-        BASE_DIR,
-        'phase4_train_model.py'
-    )
-
-    subprocess.run([
-        'python',
-        script_path
-    ])
-
-    messages.success(
-        request,
-        "Model Trained Successfully"
-    )
-
-    return redirect('attendance_page')
-
-# ---------------- ATTENDANCE PAGE ----------------
-
-def attendance_page(request):
-
-    if not request.session.get('user'):
-
-        return redirect('login')
-
-    return render(
-        request,
-        'attendance.html'
-    )
-
-# ---------------- START ATTENDANCE ----------------
-
-def start_attendance(request):
-
-    if not request.session.get('user'):
-
-        return redirect('login')
-
-    script_path = os.path.join(
-        BASE_DIR,
-        'phase5_recognition_with_attendance.py'
-    )
-
-    subprocess.run([
-        'python',
-        script_path
-    ])
-
-    messages.success(
-        request,
-        "Attendance Completed"
-    )
-
-    return redirect('dashboard')
-
-# ---------------- DASHBOARD ----------------
-
-def dashboard(request):
-
-    if not request.session.get('user'):
-
-        return redirect('login')
-
-    attendance_data = []
-
-    csv_path = os.path.join(
-        BASE_DIR,
-        'attendance.csv'
-    )
-
-    # ✅ READ CSV FILE
-
-    if os.path.exists(csv_path):
-
-        with open(
-            csv_path,
-            'r',
-            newline='',
-            encoding='utf-8'
-        ) as file:
-
-            reader = csv.reader(file)
-
-            # SKIP HEADER
-            next(reader, None)
-
-            for row in reader:
-
-                if len(row) >= 3:
-
-                    attendance_data.append({
-
-                        'name': row[0],
-                        'date': row[1],
-                        'time': row[2]
-
-                    })
-
-    return render(
-
-        request,
-        'dashboard.html',
-        {
-            'data': attendance_data
-        }
-    )
-
-# ---------------- LOGOUT ----------------
-
-def logout_view(request):
-
-    request.session.flush()
-
-    return redirect('login')
+    return render(request, 'register.html')
